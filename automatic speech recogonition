@@ -1,0 +1,127 @@
+import speech_recognition as sr
+import pyttsx3
+import os
+import datetime
+import subprocess
+import sys
+import webbrowser 
+from IPython.display import Audio, display
+
+
+engine = pyttsx3.init()
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[2].id)
+recognizer  = sr.Recognizer() 
+
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+def open_software(software_name):
+    if 'chrome' in software_name:
+        speak('Opening Chrome...')
+        program = r"C:\Program Files\Google\Chrome\Application\chrome.exe"
+        subprocess.Popen([program])
+
+    elif 'microsoft edge' in software_name:
+        speak('Opening Microsoft Edge...')
+        program = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+        subprocess.Popen([program])
+
+    elif 'youtube' in software_name:
+        speak('Opening Youtube')
+        video_url = r"https://www.youtube.com/watch?v=fiGQJAGBrZQ"
+        webbrowser.open(video_url)
+
+    elif 'notepad' in software_name:
+        speak('Opening Notepad...')
+        subprocess.Popen(['notepad.exe']) 
+    
+    elif 'calculator' in software_name:
+        speak('Opening Calculator...')
+        subprocess.Popen(['calc.exe'])
+    else:
+        speak(f"I couldn't find the software {software_name}")
+
+def close_software(software_name):
+    if 'chrome' in software_name:
+ speak('Closing Chrome...')
+        os.system("taskkill /f /im chrome.exe")
+
+    elif 'microsoft edge' in software_name:
+        speak('Closing Microsoft Edge...')
+        os.system("taskkill /f /im msedge.exe")
+
+    elif 'notepad' in software_name:
+        speak('Closing Notepad...')
+        os.system("taskkill /f /im notepad.exe")
+    elif 'calculator' in software_name:
+        speak('Closing Calculator...')
+        os.system("taskkill /f /im calculator.exe")
+    else:
+        speak(f"I couldn't find any open software named {software_name}")
+
+def listen_for_wake_word():
+    with sr.Microphone() as source:
+        print('just say jarvis...')
+        while True:
+            recognizer.adjust_for_ambient_noise(source, duration=0.5)
+            recorded_audio = recognizer.listen(source)
+            try:
+                text = recognizer.recognize_google(recorded_audio, language='en_US')
+                text = text.lower()
+                if 'jarvis' in text:
+                    print("voice detected")
+                    speak('I am jarvis, sams augmented reality, and defense,system')
+                    speak('Just a Rather, Very Intelligent,System, Hello sam, How can I help you?')
+                    return True
+            except Exception as ex:
+                print("Could not understand audio, please try again.")
+
+def cmd():
+    with sr.Microphone() as source:
+        print('Clearing background noise... please wait!')
+        recognizer.adjust_for_ambient_noise(source, duration=0.5)
+        print('Ask me anything...')
+        recorded_audio = recognizer.listen(source)
+
+    try:
+        text = recognizer.recognize_google(recorded_audio, language='en_US')
+        text = text.lower()
+        print('Your message:', text)
+    except Exception as ex:
+        print(ex)
+        return
+ if 'stop' in text:
+        speak('Stopping the program. Goodbye!')
+        sys.exit()
+    if 'open' in text:
+        software_name = text.replace('open', '').strip()
+        open_software(software_name)
+    elif 'close' in text:
+        software_name = text.replace('close', '').strip()
+        close_software(software_name)
+    elif 'time' in text:
+        current_time = datetime.datetime.now().strftime('%I:%M %p')
+        print(current_time)
+        speak(current_time)
+    elif 'tell me some story' in text:
+        speak('For once, my dog ate my homework, really!, I had drawn a picture of a burger for my project, and I guess it looked, too good. My teacher laughed, when I told her and asked,she said, "Was it a tasty assignment?", Luckily, she let me redo it.')
+    elif 'what is your name' in text:
+        speak('My name is Jarvis Your Artificial Intelligence')
+    elif 'how old are you' in text:
+        speak('in 1956, where the term "artificial intelligence" was first used, dont worry, my age is sixty-nine, only')
+    elif 'play lok sita favourite rhymes' in text:
+        print(" ok . Playing rhymes...")
+        try: 
+            display(Audio(r"C:\Users\SAMYUCTHAN\Downloads\சாய்ந்தாடம்மா and more _ Tamil Rhymes & Baby Songs Collection _ Infobells.mp3", autoplay=True))
+        except Exception as e:
+            print(f"Could not play the file: {e}")
+            speak("I couldn't play the rhymes. Please check the file path.")
+    else:
+        print("I cant get you, Try again.")
+while True:
+    if listen_for_wake_word():
+        while True: 
+            if cmd():
+                break 
